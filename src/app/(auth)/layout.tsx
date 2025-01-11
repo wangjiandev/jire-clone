@@ -6,7 +6,7 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
     <main className="min-h-screen bg-neutral-100">
       <div className="mx-auto max-w-screen-2xl p-4">
         <nav className="flex items-center justify-between">
-          <Image src="/logo.svg" alt="logo" width={100} height={50} />
+          <Image src="/logo.svg" alt="logo" width={143} height={28} />
           <div className="flex items-center gap-2">
             <Button variant="secondary">Sign Up</Button>
           </div>
