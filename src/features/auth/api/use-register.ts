@@ -11,12 +11,6 @@ export const useRegister = () => {
       const res = await client.api.auth.register.$post({ json })
       return await res.json()
     },
-    onError: (error) => {
-      console.log('error: ', error)
-    },
-    onSuccess: (data) => {
-      console.log('data: ', data)
-    },
   })
 
   return mutation

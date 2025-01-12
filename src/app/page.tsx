@@ -1,15 +1,18 @@
-import { Button } from '@/components/ui/button'
-import { createAdminClient } from '@/lib/appwrite'
+'use client'
+
+import { useCurrent } from '@/features/auth/api/use-current'
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 
 export default function Home() {
-  console.log('createAdminClient: ', createAdminClient)
-  return (
-    <div className="flex gap-4">
-      <Button>Primary</Button>
-      <Button variant="secondary">Secondary</Button>
-      <Button variant="outline">Outline</Button>
-      <Button variant="ghost">Ghost</Button>
-      <Button variant="link">Link</Button>
-    </div>
-  )
+  const router = useRouter()
+  const { data, isLoading } = useCurrent()
+
+  useEffect(() => {
+    if (!data && !isLoading) {
+      router.push('/sign-in')
+    }
+  }, [data])
+
+  return <div className="flex gap-4">only visible to authenticated users {JSON.stringify(data)}</div>
 }
