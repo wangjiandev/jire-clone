@@ -6,8 +6,31 @@ import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { FaGoogle } from 'react-icons/fa'
 import { FaGithub } from 'react-icons/fa'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
+import Link from 'next/link'
 
-const SignUpCard = () => {
+const formSchema = z.object({
+  name: z.string().trim().min(1, 'Name is required'),
+  email: z.string().email(),
+  password: z.string().min(8, 'Minimum 8 characters'),
+})
+
+const SignInCard = () => {
+  const form = useForm<z.infer<typeof formSchema>>({
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+    },
+    resolver: zodResolver(formSchema),
+  })
+
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    console.log({ values })
+  }
   return (
     <Card className="h-full w-full border-none shadow-none md:w-[487px]">
       <CardHeader className="flex items-center justify-center p-7 text-center">
@@ -18,23 +41,49 @@ const SignUpCard = () => {
         <Separator />
       </div>
       <CardContent className="p-7">
-        <form className="space-y-4">
-          <Input required type="text" value={''} onChange={() => {}} placeholder="Enter Name" />
-          <Input required type="email" value={''} onChange={() => {}} placeholder="Enter Email Address" />
-          <Input
-            required
-            type="password"
-            value={''}
-            onChange={() => {}}
-            placeholder="Enter Password"
-            disabled={false}
-            max={256}
-            min={8}
-          />
-          <Button disabled={false} size="lg" className="w-full">
-            Login
-          </Button>
-        </form>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              name="name"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input {...field} type="text" placeholder="Enter Name" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="email"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input {...field} type="email" placeholder="Enter Email Address" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="password"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input {...field} type="password" placeholder="Enter Password" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button disabled={false} size="lg" className="w-full">
+              Register
+            </Button>
+          </form>
+        </Form>
       </CardContent>
       <div className="px-7">
         <Separator />
@@ -49,8 +98,19 @@ const SignUpCard = () => {
           Continue with Github
         </Button>
       </CardContent>
+      <div className="px-7">
+        <Separator />
+      </div>
+      <CardContent className="p-7">
+        <p className="text-center text-sm text-neutral-500">
+          Already have an account?{' '}
+          <Link href="/sign-in" className="text-primary underline">
+            Sign in
+          </Link>
+        </p>
+      </CardContent>
     </Card>
   )
 }
 
-export default SignUpCard
+export default SignInCard
