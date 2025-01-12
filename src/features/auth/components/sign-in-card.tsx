@@ -11,23 +11,22 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import Link from 'next/link'
-
-const formSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8, 'Minimum 8 characters'),
-})
+import { loginSchema } from '@/features/auth/schemas'
+import { useLogin } from '@/features/auth/api/use-login'
 
 const SignInCard = () => {
-  const form = useForm<z.infer<typeof formSchema>>({
+  const { mutate } = useLogin()
+
+  const form = useForm<z.infer<typeof loginSchema>>({
     defaultValues: {
       email: '',
       password: '',
     },
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(loginSchema),
   })
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log({ values })
+  const onSubmit = (values: z.infer<typeof loginSchema>) => {
+    mutate({ json: values })
   }
   return (
     <Card className="h-full w-full border-none shadow-none md:w-[487px]">
