@@ -1,37 +1,38 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card'
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { FaGithub, FaGoogle } from 'react-icons/fa'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-
-const formSchema = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(4, 'Password must be at least 4 characters'),
-})
+import { loginSchema } from '@/features/auth/schema'
+import { useLogin } from '@/features/auth/api/use-login'
 
 const SignInCard = () => {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const { mutate, isPending } = useLogin()
+
+  const form = useForm<z.infer<typeof loginSchema>>({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
       email: '',
       password: '',
     },
   })
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
+  const onSubmit = (values: z.infer<typeof loginSchema>) => {
     console.log(values)
+    mutate(values)
   }
 
   return (
     <Card className="h-full w-full shadow-none md:w-[487px]">
       <CardHeader className="flex items-center justify-center p-7 text-center">
         <CardTitle className="text-2xl">Sign In</CardTitle>
+        <CardDescription>Login to your account</CardDescription>
       </CardHeader>
       <Separator />
       <CardContent className="p-7">

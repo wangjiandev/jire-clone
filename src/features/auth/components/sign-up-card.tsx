@@ -1,12 +1,35 @@
 'use client'
 
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import { Card, CardDescription, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { FaGithub, FaGoogle } from 'react-icons/fa'
 
+const formSchema = z.object({
+  name: z.string().trim().min(2, 'Name must be at least 2 characters'),
+  email: z.string().trim().email('Invalid email address'),
+  password: z.string().min(4, 'Password must be at least 4 characters'),
+})
+
 const SignUpCard = () => {
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+    },
+  })
+
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    console.log(values)
+  }
+
   return (
     <Card className="h-full w-full shadow-none md:w-[487px]">
       <CardHeader className="flex items-center justify-center p-7 text-center">
@@ -15,14 +38,49 @@ const SignUpCard = () => {
       </CardHeader>
       <Separator />
       <CardContent className="p-7">
-        <form className="space-y-4">
-          <Input placeholder="Enter Email Address" type="email" required value={''} onChange={() => {}} />
-          <Input placeholder="Enter Password" type="password" min={4} required value={''} onChange={() => {}} />
-          <Input placeholder="Enter Confirm Password" type="password" min={4} required value={''} onChange={() => {}} />
-          <Button type="submit" size="lg" className="w-full">
-            Sign Up
-          </Button>
-        </form>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              name="name"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input placeholder="Enter Name" type="text" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="email"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input placeholder="Enter Email Address" type="email" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="password"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input placeholder="Enter Password" type="password" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit" size="lg" className="w-full">
+              Sign Up
+            </Button>
+          </form>
+        </Form>
       </CardContent>
       <Separator />
       <CardContent className="flex flex-col gap-4 p-7">
