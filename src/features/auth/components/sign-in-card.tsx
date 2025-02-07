@@ -11,6 +11,7 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { loginSchema } from '@/features/auth/schema'
 import { useLogin } from '@/features/auth/api/use-login'
+import { Loader } from 'lucide-react'
 
 const SignInCard = () => {
   const { mutate, isPending } = useLogin()
@@ -43,7 +44,7 @@ const SignInCard = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder="Enter Email Address" type="email" {...field} />
+                    <Input placeholder="Enter Email Address" type="email" disabled={isPending} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -55,25 +56,35 @@ const SignInCard = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder="Enter Password" type="password" {...field} />
+                    <Input placeholder="Enter Password" type="password" disabled={isPending} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit" size="lg" className="w-full">
-              Login
+            <Button type="submit" size="lg" disabled={isPending} className="w-full">
+              {isPending ? <Loader className="size-4 animate-spin text-muted-foreground" /> : 'Login'}
             </Button>
           </form>
         </Form>
       </CardContent>
       <Separator />
       <CardContent className="flex flex-col gap-4 p-7">
-        <Button variant="outline" type="submit" size="lg" className="flex w-full items-center justify-center">
+        <Button
+          variant="outline"
+          type="submit"
+          disabled={isPending}
+          size="lg"
+          className="flex w-full items-center justify-center">
           <FaGoogle className="mr-2 size-5" />
           Login With Google
         </Button>
-        <Button variant="outline" type="submit" size="lg" className="flex w-full items-center justify-center">
+        <Button
+          variant="outline"
+          type="submit"
+          disabled={isPending}
+          size="lg"
+          className="flex w-full items-center justify-center">
           <FaGithub className="mr-2 size-5" />
           Login With Github
         </Button>
