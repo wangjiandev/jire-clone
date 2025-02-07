@@ -9,16 +9,14 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '@/component
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { FaGithub, FaGoogle } from 'react-icons/fa'
-
-const formSchema = z.object({
-  name: z.string().trim().min(2, 'Name must be at least 2 characters'),
-  email: z.string().trim().email('Invalid email address'),
-  password: z.string().min(4, 'Password must be at least 4 characters'),
-})
+import { registerSchema } from '@/features/auth/schema'
+import { useRegister } from '@/features/auth/api/use-register'
 
 const SignUpCard = () => {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const { mutate, isPending } = useRegister()
+
+  const form = useForm<z.infer<typeof registerSchema>>({
+    resolver: zodResolver(registerSchema),
     defaultValues: {
       name: '',
       email: '',
@@ -26,8 +24,9 @@ const SignUpCard = () => {
     },
   })
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
+  const onSubmit = (values: z.infer<typeof registerSchema>) => {
     console.log(values)
+    mutate(values)
   }
 
   return (
