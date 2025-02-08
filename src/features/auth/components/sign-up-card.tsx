@@ -11,6 +11,7 @@ import { Separator } from '@/components/ui/separator'
 import { FaGithub, FaGoogle } from 'react-icons/fa'
 import { registerSchema } from '@/features/auth/schema'
 import { useRegister } from '@/features/auth/api/use-register'
+import { Loader } from 'lucide-react'
 
 const SignUpCard = () => {
   const { mutate, isPending } = useRegister()
@@ -44,7 +45,7 @@ const SignUpCard = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder="Enter Name" type="text" {...field} />
+                    <Input placeholder="Enter Name" type="text" disabled={isPending} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -56,7 +57,7 @@ const SignUpCard = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder="Enter Email Address" type="email" {...field} />
+                    <Input placeholder="Enter Email Address" type="email" disabled={isPending} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -68,14 +69,14 @@ const SignUpCard = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder="Enter Password" type="password" {...field} />
+                    <Input placeholder="Enter Password" type="password" disabled={isPending} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit" size="lg" className="w-full">
-              Sign Up
+            <Button type="submit" size="lg" className="w-full" disabled={isPending}>
+              {isPending ? <Loader className="size-4 animate-spin text-muted-foreground" /> : 'Register'}
             </Button>
           </form>
         </Form>
