@@ -10,6 +10,10 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { useCreateWorkspace } from '../api/use-create-workspace'
+import { useRef } from 'react'
+import Image from 'next/image'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { ImageIcon } from 'lucide-react'
 
 interface CreateWorkspaceFormProps {
   onCancel?: () => void
@@ -17,6 +21,7 @@ interface CreateWorkspaceFormProps {
 
 const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
   const { mutate, isPending } = useCreateWorkspace()
+  const inputRef = useRef<HTMLInputElement>(null)
 
   const form = useForm<z.infer<typeof createWorkspaceSchema>>({
     resolver: zodResolver(createWorkspaceSchema),
@@ -26,9 +31,27 @@ const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
   })
 
   const onSubmit = (values: z.infer<typeof createWorkspaceSchema>) => {
-    console.log({ json: values })
-    mutate({ json: values })
+    const finalValue = {
+      ...values,
+      image: values.image instanceof File ? values.image : '',
+    }
+    mutate(
+      { form: finalValue },
+      {
+        onSuccess: () => {
+          form.reset()
+        },
+      },
+    )
   }
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      form.setValue('image', file)
+    }
+  }
+
   return (
     <Card className="h-full w-full border-none shadow-none">
       <CardHeader className="flex p-7">
@@ -40,7 +63,7 @@ const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <div className="flex flex-col">
+            <div className="flex flex-col gap-4">
               <FormField
                 control={form.control}
                 name="name"
@@ -52,6 +75,52 @@ const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
                     </FormControl>
                     <FormMessage />
                   </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="image"
+                render={({ field }) => (
+                  <div className="flex flex-col gap-y-2">
+                    <div className="flex items-center gap-x-5">
+                      {field.value ? (
+                        <div className="relative size-[72px] overflow-hidden rounded-md">
+                          <Image
+                            src={field.value instanceof File ? URL.createObjectURL(field.value) : field.value}
+                            alt="logo"
+                            className="object-cover"
+                            fill></Image>
+                        </div>
+                      ) : (
+                        <Avatar className="size-[72px]">
+                          <AvatarFallback>
+                            <ImageIcon className="size-[36px] text-neutral-400"></ImageIcon>
+                          </AvatarFallback>
+                        </Avatar>
+                      )}
+                      <div className="flex flex-col">
+                        <p className="text-sm">Workspace Icon</p>
+                        <p className="text-sm text-muted-foreground">JPG, PNG, SVG, max 1MB</p>
+                        <input
+                          className="hidden"
+                          accept=".jpg,.png,.svg"
+                          type="file"
+                          ref={inputRef}
+                          disabled={isPending}
+                          onChange={handleImageChange}
+                        />
+                        <Button
+                          type="button"
+                          disabled={isPending}
+                          variant="secondary"
+                          size="sm"
+                          className="mt-2 w-fit"
+                          onClick={() => inputRef.current?.click()}>
+                          Upload Image
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
                 )}
               />
             </div>
