@@ -18,8 +18,8 @@ export const useLogout = () => {
       return await response.json()
     },
     onSuccess: () => {
-      toast.success('User Logout')
       router.refresh()
+      toast.success('User Logout')
       queryClint.invalidateQueries({ queryKey: ['current'] })
       queryClint.invalidateQueries({ queryKey: ['workspaces'] })
     },
