@@ -14,12 +14,14 @@ import { useRef } from 'react'
 import Image from 'next/image'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { ImageIcon } from 'lucide-react'
-
+import { useRouter } from 'next/navigation'
+import { cn } from '@/lib/utils'
 interface CreateWorkspaceFormProps {
   onCancel?: () => void
 }
 
 const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
+  const router = useRouter()
   const { mutate, isPending } = useCreateWorkspace()
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -38,8 +40,12 @@ const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
     mutate(
       { form: finalValue },
       {
-        onSuccess: () => {
+        onSuccess: ({ data }) => {
           form.reset()
+          onCancel?.()
+          if (data.id) {
+            router.push(`/workspaces/${data.id}`)
+          }
         },
       },
     )
@@ -128,7 +134,13 @@ const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
               <Separator />
             </div>
             <div className="flex items-center justify-between">
-              <Button type="button" size="lg" variant="secondary" disabled={isPending}>
+              <Button
+                onClick={onCancel}
+                type="button"
+                size="lg"
+                variant="secondary"
+                disabled={isPending}
+                className={cn(!onCancel && 'invisible')}>
                 Cancel
               </Button>
               <Button type="submit" size="lg" disabled={isPending}>
