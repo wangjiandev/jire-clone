@@ -1,10 +1,11 @@
 'use client'
 
 import Image from 'next/image'
+import useConfirm from '@/hooks/use-confirm'
+
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { updateWorkspaceSchema } from '../schema'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
@@ -15,9 +16,11 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { ArrowLeftIcon, ImageIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
+import { useUpdateWorkspace } from '@/features/workspaces/api/use-update-workspace'
+import { useDeleteWorkspace } from '@/features/workspaces/api/use-delete-workspace'
 
+import { updateWorkspaceSchema } from '../schema'
 import { Workspace } from '../types'
-import { useUpdateWorkspace } from '../api/use-update-workspace'
 
 interface EditWorkspaceFormProps {
   onCancel?: () => void
@@ -27,7 +30,13 @@ interface EditWorkspaceFormProps {
 const EditWorkspaceForm = ({ onCancel, initialValues }: EditWorkspaceFormProps) => {
   const router = useRouter()
   const { mutate, isPending } = useUpdateWorkspace()
+  const [confirmDelete, ConfirmationDialog] = useConfirm(
+    'Delete Workspace',
+    'Are you sure you want to delete this workspace?',
+    'destructive',
+  )
   const inputRef = useRef<HTMLInputElement>(null)
+  const { mutate: deleteWorkspace, isPending: isDeleting } = useDeleteWorkspace()
 
   const form = useForm<z.infer<typeof updateWorkspaceSchema>>({
     resolver: zodResolver(updateWorkspaceSchema),
@@ -68,8 +77,28 @@ const EditWorkspaceForm = ({ onCancel, initialValues }: EditWorkspaceFormProps) 
     }
   }
 
+  const handleDeleteWorkspace = async () => {
+    const isConfirmed = await confirmDelete()
+    console.log('handleDeleteWorkspace', isConfirmed)
+    if (!isConfirmed) return
+
+    deleteWorkspace(
+      {
+        param: {
+          workspaceId: initialValues.$id,
+        },
+      },
+      {
+        onSuccess: () => {
+          router.push('/')
+        },
+      },
+    )
+  }
+
   return (
     <div className="flex flex-col gap-y-4">
+      <ConfirmationDialog />
       <Card className="h-full w-full border-none shadow-none">
         <CardHeader className="flex flex-row items-center gap-x-4 space-y-0 p-7">
           <Button
@@ -195,8 +224,8 @@ const EditWorkspaceForm = ({ onCancel, initialValues }: EditWorkspaceFormProps) 
               className="ml-auto mt-6 w-fit"
               size="sm"
               variant="destructive"
-              disabled={isPending}
-              onClick={() => {}}
+              disabled={isPending || isDeleting}
+              onClick={handleDeleteWorkspace}
               type="button">
               Delete Workspace
             </Button>
