@@ -27,30 +27,24 @@ const app = new Hono()
     const databases = c.get('databases')
     const user = c.get('user')
     const storage = c.get('storage')
-
     const { name, image } = c.req.valid('form')
-
     let uploadedImageUrl: string | undefined
-
     if (image instanceof File) {
       const file = await storage.createFile(IMAGE_BUCKET_ID, ID.unique(), image)
       const arrayBuffer = await storage.getFilePreview(IMAGE_BUCKET_ID, file.$id)
       uploadedImageUrl = `data:image/png;base64,${Buffer.from(arrayBuffer).toString('base64')}`
     }
-
     const workspace = await databases.createDocument(DATABASE_ID, WORKSPACE_ID, ID.unique(), {
       name,
       userId: user.$id,
       imageUrl: uploadedImageUrl,
       inviteCode: generateInviteCode(6),
     })
-
     await databases.createDocument(DATABASE_ID, MEMBERS_ID, ID.unique(), {
       userId: user.$id,
       workspaceId: workspace.$id,
       role: MemberRole.ADMIN,
     })
-
     return c.json({
       data: workspace,
     })
@@ -59,24 +53,19 @@ const app = new Hono()
     const databases = c.get('databases')
     const user = c.get('user')
     const storage = c.get('storage')
-
     const { workspaceId } = c.req.param()
     const { name, image } = c.req.valid('form')
-
     const member = await getMember({
       databases,
       workspaceId,
       userId: user.$id,
     })
-
     if (!member || member.role !== MemberRole.ADMIN) {
       return c.json({
         error: 'You are not authorized to update this workspace',
       }, 401)
     }
-
     let uploadedImageUrl: string | undefined
-
     if (image instanceof File) {
       const file = await storage.createFile(IMAGE_BUCKET_ID, ID.unique(), image)
       const arrayBuffer = await storage.getFilePreview(IMAGE_BUCKET_ID, file.$id)
@@ -84,14 +73,30 @@ const app = new Hono()
     } else {
       uploadedImageUrl = image
     }
-
     const workspace = await databases.updateDocument(DATABASE_ID, WORKSPACE_ID, workspaceId, {
       name,
       imageUrl: uploadedImageUrl,
     })
-
     return c.json({
       data: workspace,
+    })
+  }).delete("/:workspaceId", sessionMiddleware, async (c) => {
+    const databases = c.get('databases')
+    const user = c.get('user')
+    const { workspaceId } = c.req.param()
+    const member = await getMember({
+      databases,
+      workspaceId,
+      userId: user.$id,
+    })
+    if (!member || member.role !== MemberRole.ADMIN) {
+      return c.json({ error: 'You are not authorized to delete this workspace' }, 401)
+    }
+    await databases.deleteDocument(DATABASE_ID, WORKSPACE_ID, workspaceId)
+    return c.json({
+      data: {
+        $id: workspaceId,
+      },
     })
   })
 

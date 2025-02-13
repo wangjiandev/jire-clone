@@ -10,7 +10,7 @@ import { usePathname } from 'next/navigation'
 const routes = [
   {
     label: 'Home',
-    href: '/',
+    href: '',
     icon: GoHome,
     activeIcon: GoHomeFill,
   },
