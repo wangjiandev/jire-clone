@@ -67,12 +67,8 @@ const EditWorkspaceForm = ({ onCancel, initialValues }: EditWorkspaceFormProps) 
                 },
             },
             {
-                onSuccess: ({ data }) => {
+                onSuccess: () => {
                     form.reset()
-                    onCancel?.()
-                    if (data.id) {
-                        router.push(`/workspaces/${data.id}`)
-                    }
                 },
             },
         )
@@ -105,18 +101,11 @@ const EditWorkspaceForm = ({ onCancel, initialValues }: EditWorkspaceFormProps) 
     const handleResetInviteCode = async () => {
         const isConfirmed = await confirmResetInviteCode()
         if (!isConfirmed) return
-        resetInviteCode(
-            {
-                param: {
-                    workspaceId: initialValues.$id,
-                },
+        resetInviteCode({
+            param: {
+                workspaceId: initialValues.$id,
             },
-            {
-                onSuccess: () => {
-                    router.refresh()
-                },
-            },
-        )
+        })
     }
 
     const fullInviteLink = `${window.location.origin}/workspaces/${initialValues.$id}/join/${initialValues.inviteCode}`
