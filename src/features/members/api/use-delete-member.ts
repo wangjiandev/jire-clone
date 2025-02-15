@@ -7,27 +7,27 @@ type ResponseType = InferResponseType<(typeof client.api.members)[':memberId']['
 type RequestType = InferRequestType<(typeof client.api.members)[':memberId']['$delete']>
 
 export const useDeleteMember = () => {
-  const queryClint = useQueryClient()
+    const queryClint = useQueryClient()
 
-  const mutation = useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ param }) => {
-      const response = await client.api.members[':memberId'].$delete({
-        param,
-      })
+    const mutation = useMutation<ResponseType, Error, RequestType>({
+        mutationFn: async ({ param }) => {
+            const response = await client.api.members[':memberId'].$delete({
+                param,
+            })
 
-      if (!response.ok) {
-        throw new Error('Failed to delete member')
-      }
+            if (!response.ok) {
+                throw new Error('Failed to delete member')
+            }
 
-      return await response.json()
-    },
-    onSuccess: () => {
-      toast.success('Member Deleted')
-      queryClint.invalidateQueries({ queryKey: ['members'] })
-    },
-    onError: () => {
-      toast.error('Failed to delete member')
-    },
-  })
-  return mutation
+            return await response.json()
+        },
+        onSuccess: () => {
+            toast.success('Member Deleted')
+            queryClint.invalidateQueries({ queryKey: ['members'] })
+        },
+        onError: () => {
+            toast.error('Failed to delete member')
+        },
+    })
+    return mutation
 }

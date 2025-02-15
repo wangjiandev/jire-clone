@@ -7,28 +7,28 @@ type ResponseType = InferResponseType<(typeof client.api.workspaces)[':workspace
 type RequestType = InferRequestType<(typeof client.api.workspaces)[':workspaceId']['$delete']>
 
 export const useDeleteWorkspace = () => {
-  const queryClint = useQueryClient()
+    const queryClint = useQueryClient()
 
-  const mutation = useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ param }) => {
-      const response = await client.api.workspaces[':workspaceId'].$delete({
-        param,
-      })
+    const mutation = useMutation<ResponseType, Error, RequestType>({
+        mutationFn: async ({ param }) => {
+            const response = await client.api.workspaces[':workspaceId'].$delete({
+                param,
+            })
 
-      if (!response.ok) {
-        throw new Error('Failed to delete workspace')
-      }
+            if (!response.ok) {
+                throw new Error('Failed to delete workspace')
+            }
 
-      return await response.json()
-    },
-    onSuccess: ({ data }) => {
-      toast.success('Workspace Deleted')
-      queryClint.invalidateQueries({ queryKey: ['workspaces'] })
-      queryClint.invalidateQueries({ queryKey: ['workspace', data.$id] })
-    },
-    onError: () => {
-      toast.error('Failed to delete workspace')
-    },
-  })
-  return mutation
+            return await response.json()
+        },
+        onSuccess: ({ data }) => {
+            toast.success('Workspace Deleted')
+            queryClint.invalidateQueries({ queryKey: ['workspaces'] })
+            queryClint.invalidateQueries({ queryKey: ['workspace', data.$id] })
+        },
+        onError: () => {
+            toast.error('Failed to delete workspace')
+        },
+    })
+    return mutation
 }

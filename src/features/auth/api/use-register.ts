@@ -8,29 +8,29 @@ type ResponseType = InferResponseType<(typeof client.api.auth.register)['$post']
 type RequestType = InferRequestType<(typeof client.api.auth.register)['$post']>['json']
 
 export const useRegister = () => {
-  const router = useRouter()
-  const queryClint = useQueryClient()
+    const router = useRouter()
+    const queryClint = useQueryClient()
 
-  const mutation = useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async (json) => {
-      const response = await client.api.auth.register.$post({
-        json,
-      })
+    const mutation = useMutation<ResponseType, Error, RequestType>({
+        mutationFn: async (json) => {
+            const response = await client.api.auth.register.$post({
+                json,
+            })
 
-      if (!response.ok) {
-        throw new Error('Failed to register')
-      }
+            if (!response.ok) {
+                throw new Error('Failed to register')
+            }
 
-      return await response.json()
-    },
-    onSuccess: () => {
-      toast.success('Register Success')
-      router.refresh()
-      queryClint.invalidateQueries({ queryKey: ['current'] })
-    },
-    onError: () => {
-      toast.error('Register Failed')
-    },
-  })
-  return mutation
+            return await response.json()
+        },
+        onSuccess: () => {
+            toast.success('Register Success')
+            router.refresh()
+            queryClint.invalidateQueries({ queryKey: ['current'] })
+        },
+        onError: () => {
+            toast.error('Register Failed')
+        },
+    })
+    return mutation
 }

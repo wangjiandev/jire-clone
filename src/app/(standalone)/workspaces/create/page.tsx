@@ -3,14 +3,14 @@ import CreateWorkspaceForm from '@/features/workspaces/components/create-workspa
 import { redirect } from 'next/navigation'
 
 const CreateWorkspacePage = async () => {
-  const user = await getCurrent()
-  if (!user) redirect('/sign-in')
+    const user = await getCurrent()
+    if (!user) redirect('/sign-in')
 
-  return (
-    <div className="w-full lg:max-w-xl">
-      <CreateWorkspaceForm />
-    </div>
-  )
+    return (
+        <div className="w-full lg:max-w-xl">
+            <CreateWorkspaceForm />
+        </div>
+    )
 }
 
 export default CreateWorkspacePage

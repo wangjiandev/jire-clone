@@ -8,28 +8,28 @@ type ResponseType = InferResponseType<(typeof client.api.auth.login)['$post']>
 type RequestType = InferRequestType<(typeof client.api.auth.login)['$post']>['json']
 
 export const useLogin = () => {
-  const router = useRouter()
-  const queryClint = useQueryClient()
-  const mutation = useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async (json) => {
-      const response = await client.api.auth.login.$post({
-        json,
-      })
+    const router = useRouter()
+    const queryClint = useQueryClient()
+    const mutation = useMutation<ResponseType, Error, RequestType>({
+        mutationFn: async (json) => {
+            const response = await client.api.auth.login.$post({
+                json,
+            })
 
-      if (!response.ok) {
-        throw new Error('Failed to Login')
-      }
+            if (!response.ok) {
+                throw new Error('Failed to Login')
+            }
 
-      return await response.json()
-    },
-    onSuccess: () => {
-      toast.success('Login Success')
-      router.refresh()
-      queryClint.invalidateQueries({ queryKey: ['current'] })
-    },
-    onError: () => {
-      toast.error('Login Failed')
-    },
-  })
-  return mutation
+            return await response.json()
+        },
+        onSuccess: () => {
+            toast.success('Login Success')
+            router.refresh()
+            queryClint.invalidateQueries({ queryKey: ['current'] })
+        },
+        onError: () => {
+            toast.error('Login Failed')
+        },
+    })
+    return mutation
 }

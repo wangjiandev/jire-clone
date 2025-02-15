@@ -7,28 +7,28 @@ type ResponseType = InferResponseType<(typeof client.api.members)[':memberId']['
 type RequestType = InferRequestType<(typeof client.api.members)[':memberId']['$patch']>
 
 export const useUpdateMember = () => {
-  const queryClint = useQueryClient()
+    const queryClint = useQueryClient()
 
-  const mutation = useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ param, json }) => {
-      const response = await client.api.members[':memberId'].$patch({
-        param,
-        json,
-      })
+    const mutation = useMutation<ResponseType, Error, RequestType>({
+        mutationFn: async ({ param, json }) => {
+            const response = await client.api.members[':memberId'].$patch({
+                param,
+                json,
+            })
 
-      if (!response.ok) {
-        throw new Error('Failed to update member')
-      }
+            if (!response.ok) {
+                throw new Error('Failed to update member')
+            }
 
-      return await response.json()
-    },
-    onSuccess: () => {
-      toast.success('Member Updated')
-      queryClint.invalidateQueries({ queryKey: ['members'] })
-    },
-    onError: () => {
-      toast.error('Failed to update member')
-    },
-  })
-  return mutation
+            return await response.json()
+        },
+        onSuccess: () => {
+            toast.success('Member Updated')
+            queryClint.invalidateQueries({ queryKey: ['members'] })
+        },
+        onError: () => {
+            toast.error('Failed to update member')
+        },
+    })
+    return mutation
 }
