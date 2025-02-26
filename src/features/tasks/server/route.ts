@@ -7,7 +7,7 @@ import { getMember } from '@/features/members/utils'
 import { DATABASE_ID, MEMBERS_ID, PROJECT_ID, TASKS_ID } from '@/config'
 import { ID, Query } from 'node-appwrite'
 import { createTaskSchema } from '../schema'
-import { TaskStatus } from '../types'
+import { Task, TaskStatus } from '../types'
 import { Project } from '@/features/projects/types'
 
 const app = new Hono()
@@ -64,7 +64,7 @@ const app = new Hono()
         query.push(Query.equal('dueDate', dueDate))
       }
 
-      const tasks = await databases.listDocuments(DATABASE_ID, TASKS_ID, query)
+      const tasks = await databases.listDocuments<Task>(DATABASE_ID, TASKS_ID, query)
 
       const projectIds = tasks.documents.map((task) => task.projectId)
       const assigneeIds = tasks.documents.map((task) => task.assigneeId)
