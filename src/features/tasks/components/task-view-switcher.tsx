@@ -5,16 +5,25 @@ import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Separator } from '@/components/ui/separator'
 import { useCreateTaskModal } from '@/features/tasks/hooks/use-create-task-modal'
+import { useTaskFilters } from '@/features/tasks/hooks/use-task-filters'
 import { useGetTasks } from '../api/use-get-tasks'
 import { useWorkspaceId } from '@/features/workspaces/hooks/use-workspace-id'
 import { useQueryState } from 'nuqs'
+import DataFilters from './data-filters'
 
 const TaskViewSwitcher = () => {
   const [view, setView] = useQueryState('view', { defaultValue: 'table' })
   const { open } = useCreateTaskModal()
   const workspaceId = useWorkspaceId()
+
+  const [{ projectId, status, assigneeId, dueDate }] = useTaskFilters()
+
   const { data: tasks, isLoading: isTasksLoading } = useGetTasks({
     workspaceId,
+    projectId,
+    status,
+    assigneeId,
+    dueDate,
   })
 
   return (
@@ -38,8 +47,7 @@ const TaskViewSwitcher = () => {
           </Button>
         </div>
         <Separator className="my-4" />
-        {/* // TODO: Add filters */}
-        data filters
+        <DataFilters />
         <Separator className="my-4" />
         {isTasksLoading ? (
           <div className="flex h-96 items-center justify-center">
@@ -47,9 +55,15 @@ const TaskViewSwitcher = () => {
           </div>
         ) : (
           <>
-            <TabsContent value="table">{JSON.stringify(tasks)}</TabsContent>
-            <TabsContent value="kanban">{JSON.stringify(tasks)}</TabsContent>
-            <TabsContent value="calendar">{JSON.stringify(tasks)}</TabsContent>
+            <TabsContent value="table" className="w-full lg:w-auto">
+              <div className="w-full lg:w-auto">{JSON.stringify(tasks)}</div>
+            </TabsContent>
+            <TabsContent value="kanban" className="w-full lg:w-auto">
+              <div className="w-full lg:w-auto">{JSON.stringify(tasks)}</div>
+            </TabsContent>
+            <TabsContent value="calendar" className="w-full lg:w-auto">
+              <div className="w-full lg:w-auto">{JSON.stringify(tasks)}</div>
+            </TabsContent>
           </>
         )}
       </div>

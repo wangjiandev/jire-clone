@@ -25,7 +25,7 @@ const DatePicker = ({ value, onChange, className, placeholder = 'Select Date' }:
             className,
           )}>
           <CalendarIcon className="size-4" />
-          {value ? format(value, 'PPP') : <span>placeholder</span>}
+          {value ? format(value, 'PPP') : <span className="text-muted-foreground">{placeholder}</span>}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
