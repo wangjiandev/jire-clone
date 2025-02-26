@@ -146,6 +146,42 @@ const app = new Hono()
       data: task,
     })
   })
+  .patch('/:taskId', zValidator('json', createTaskSchema.partial()), sessionMiddleware, async (c) => {
+    const databases = c.get('databases')
+    const user = c.get('user')
+    const { taskId } = c.req.param()
+    const { name, status, projectId, dueDate, assigneeId, description } = c.req.valid('json')
+
+    const existingTask = await databases.getDocument<Task>(DATABASE_ID, TASKS_ID, taskId)
+
+    const member = await getMember({
+      databases,
+      workspaceId: existingTask.workspaceId,
+      userId: user.$id,
+    })
+
+    if (!member) {
+      return c.json(
+        {
+          error: 'Unauthorized',
+        },
+        401,
+      )
+    }
+
+    const task = await databases.updateDocument<Task>(DATABASE_ID, TASKS_ID, taskId, {
+      name,
+      status,
+      projectId,
+      dueDate,
+      assigneeId,
+      description,
+    })
+
+    return c.json({
+      data: task,
+    })
+  })
   .delete('/:taskId', sessionMiddleware, async (c) => {
     const databases = c.get('databases')
     const user = c.get('user')
@@ -173,6 +209,44 @@ const app = new Hono()
     return c.json({
       data: {
         $id: taskId,
+      },
+    })
+  })
+  .get('/:taskId', sessionMiddleware, async (c) => {
+    const databases = c.get('databases')
+    const user = c.get('user')
+    const { taskId } = c.req.param()
+    const { users } = await createAdminClient()
+
+    const task = await databases.getDocument<Task>(DATABASE_ID, TASKS_ID, taskId)
+
+    const member = await getMember({
+      databases,
+      workspaceId: task.workspaceId,
+      userId: user.$id,
+    })
+
+    if (!member) {
+      return c.json({ error: 'You are not a member of this workspace' }, 401)
+    }
+
+    const project = await databases.getDocument<Project>(DATABASE_ID, PROJECT_ID, task.projectId)
+
+    const assignee = await databases.getDocument(DATABASE_ID, MEMBERS_ID, task.assigneeId)
+
+    const assigneeUser = await users.get(assignee.userId)
+
+    const assigneeWithUser = {
+      ...assignee,
+      name: assigneeUser.name,
+      email: assigneeUser.email,
+    }
+
+    return c.json({
+      data: {
+        ...task,
+        assignee: assigneeWithUser,
+        project,
       },
     })
   })
