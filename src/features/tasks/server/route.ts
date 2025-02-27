@@ -6,7 +6,7 @@ import { createAdminClient } from '@/lib/appwrite'
 import { getMember } from '@/features/members/utils'
 import { DATABASE_ID, MEMBERS_ID, PROJECT_ID, TASKS_ID } from '@/config'
 import { ID, Query } from 'node-appwrite'
-import { createTaskSchema } from '../schema'
+import { createTaskSchema, bulkUpdateTaskSchema } from '../schema'
 import { Task, TaskStatus } from '../types'
 import { Project } from '@/features/projects/types'
 
@@ -250,4 +250,42 @@ const app = new Hono()
       },
     })
   })
+  .post('/bulk-update', sessionMiddleware, zValidator('json', bulkUpdateTaskSchema), async (c) => {
+    const databases = c.get('databases')
+    const user = c.get('user')
+    const { tasks } = c.req.valid('json')
+    const taskIds = tasks.map((task) => task.$id)
+    const taskToUpdate = await databases.listDocuments<Task>(DATABASE_ID, TASKS_ID, [Query.contains('$id', taskIds)])
+
+    const workspaceIds = new Set(taskToUpdate.documents.map((task) => task.workspaceId))
+    if (workspaceIds.size !== 1) {
+      return c.json({ error: 'All tasks must be in the same workspace' }, 400)
+    }
+
+    const workspaceId = workspaceIds.values().next().value!
+
+    const member = await getMember({
+      databases,
+      workspaceId,
+      userId: user.$id,
+    })
+
+    if (!member) {
+      return c.json({ error: 'You are not a member of this workspace' }, 401)
+    }
+
+    const updatedTasks = await Promise.all(
+      tasks.map(async (task) => {
+        return await databases.updateDocument(DATABASE_ID, TASKS_ID, task.$id, {
+          status: task.status,
+          position: task.position,
+        })
+      }),
+    )
+
+    return c.json({
+      data: updatedTasks,
+    })
+  })
+
 export default app

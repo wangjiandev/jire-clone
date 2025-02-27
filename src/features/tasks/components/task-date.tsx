@@ -22,7 +22,7 @@ const TaskDate = ({ value, className }: TaskDateProps) => {
   }
 
   return (
-    <div className={textColor}>
+    <div className={cn(textColor, 'flex items-center justify-center')}>
       <span className={cn(className, 'truncate')}>{format(endDay, 'MM/dd/yyyy')}</span>
     </div>
   )
