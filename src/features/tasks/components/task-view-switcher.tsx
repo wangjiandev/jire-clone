@@ -17,6 +17,7 @@ import { DataTable } from './data-table'
 import { columns } from './columns'
 import DataKanban from './data-kanban'
 import { TaskStatus } from '../types'
+import DataCalendar from './data-calendar'
 
 const TaskViewSwitcher = () => {
   const [view, setView] = useQueryState('view', { defaultValue: 'table' })
@@ -81,7 +82,7 @@ const TaskViewSwitcher = () => {
               <DataKanban data={tasks ?? []} onChange={onKanbanChange} />
             </TabsContent>
             <TabsContent value="calendar" className="overflow-x-auto">
-              <div className="w-96">{JSON.stringify(tasks)}</div>
+              <DataCalendar data={tasks ?? []}></DataCalendar>
             </TabsContent>
           </>
         )}
