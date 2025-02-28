@@ -8,30 +8,28 @@ type ResponseType = InferResponseType<(typeof client.api.workspaces)[':workspace
 type RequestType = InferRequestType<(typeof client.api.workspaces)[':workspaceId']['reset-invite-code']['$post']>
 
 export const useResetInviteCode = () => {
-    const router = useRouter()
-    const queryClint = useQueryClient()
+  const queryClint = useQueryClient()
 
-    const mutation = useMutation<ResponseType, Error, RequestType>({
-        mutationFn: async ({ param }) => {
-            const response = await client.api.workspaces[':workspaceId']['reset-invite-code'].$post({
-                param,
-            })
+  const mutation = useMutation<ResponseType, Error, RequestType>({
+    mutationFn: async ({ param }) => {
+      const response = await client.api.workspaces[':workspaceId']['reset-invite-code'].$post({
+        param,
+      })
 
-            if (!response.ok) {
-                throw new Error('Failed to reset invite code')
-            }
+      if (!response.ok) {
+        throw new Error('Failed to reset invite code')
+      }
 
-            return await response.json()
-        },
-        onSuccess: ({ data }) => {
-            toast.success('Invite code reset')
-            router.refresh()
-            queryClint.invalidateQueries({ queryKey: ['workspaces'] })
-            queryClint.invalidateQueries({ queryKey: ['workspace', data.$id] })
-        },
-        onError: () => {
-            toast.error('Failed to reset invite code')
-        },
-    })
-    return mutation
+      return await response.json()
+    },
+    onSuccess: ({ data }) => {
+      toast.success('Invite code reset')
+      queryClint.invalidateQueries({ queryKey: ['workspaces'] })
+      queryClint.invalidateQueries({ queryKey: ['workspace', data.$id] })
+    },
+    onError: () => {
+      toast.error('Failed to reset invite code')
+    },
+  })
+  return mutation
 }

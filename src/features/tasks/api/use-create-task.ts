@@ -2,13 +2,11 @@ import { client } from '@/lib/rpc'
 import { InferResponseType, InferRequestType } from 'hono/client'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { useRouter } from 'next/navigation'
 
 type ResponseType = InferResponseType<(typeof client.api.tasks)['$post'], 200>
 type RequestType = InferRequestType<(typeof client.api.tasks)['$post']>
 
 export const useCreateTask = () => {
-  const router = useRouter()
   const queryClint = useQueryClient()
 
   const mutation = useMutation<ResponseType, Error, RequestType>({
@@ -25,7 +23,6 @@ export const useCreateTask = () => {
     },
     onSuccess: () => {
       toast.success('Task Created')
-      router.refresh()
       queryClint.invalidateQueries({ queryKey: ['tasks'] })
     },
     onError: () => {
