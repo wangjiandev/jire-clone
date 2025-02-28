@@ -22,11 +22,17 @@ const TaskDescription = ({ task }: TaskDescriptionProps) => {
   const { mutate: updateTask, isPending: isUpdating } = useUpdateTask()
 
   const handleSubmit = async () => {
-    updateTask({
-      json: { description: value },
-      param: { taskId: task.$id },
-    })
-    setIsEditing(false)
+    updateTask(
+      {
+        json: { description: value },
+        param: { taskId: task.$id },
+      },
+      {
+        onSuccess: () => {
+          setIsEditing(false)
+        },
+      },
+    )
   }
 
   return (

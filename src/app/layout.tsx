@@ -10,23 +10,23 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-    title: 'jire-clone',
-    description: 'jire-clone',
+  title: 'jire-clone',
+  description: 'jire-clone',
 }
 
 export default function RootLayout({
-    children,
+  children,
 }: Readonly<{
-    children: React.ReactNode
+  children: React.ReactNode
 }>) {
-    return (
-        <html lang="en">
-            <body className={cn(inter.className, 'min-h-screen antialiased')}>
-                <Toaster />
-                <QueryProvider>
-                    <NuqsAdapter>{children}</NuqsAdapter>
-                </QueryProvider>
-            </body>
-        </html>
-    )
+  return (
+    <html lang="en">
+      <body className={cn(inter.className, 'min-h-screen antialiased')}>
+        <Toaster />
+        <QueryProvider>
+          <NuqsAdapter>{children}</NuqsAdapter>
+        </QueryProvider>
+      </body>
+    </html>
+  )
 }
