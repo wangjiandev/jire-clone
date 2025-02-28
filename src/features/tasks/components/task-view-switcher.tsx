@@ -19,7 +19,11 @@ import DataKanban from './data-kanban'
 import { TaskStatus } from '../types'
 import DataCalendar from './data-calendar'
 
-const TaskViewSwitcher = () => {
+interface TaskViewSwitcherProps {
+  hideProjectFilter?: boolean
+}
+
+const TaskViewSwitcher = ({ hideProjectFilter }: TaskViewSwitcherProps) => {
   const [view, setView] = useQueryState('view', { defaultValue: 'table' })
   const { open } = useCreateTaskModal()
   const workspaceId = useWorkspaceId()
@@ -67,7 +71,7 @@ const TaskViewSwitcher = () => {
           </Button>
         </div>
         <Separator className="my-4" />
-        <DataFilters />
+        <DataFilters hideProjectFilter={hideProjectFilter} />
         <Separator className="my-4" />
         {isTasksLoading ? (
           <div className="flex h-96 items-center justify-center">
