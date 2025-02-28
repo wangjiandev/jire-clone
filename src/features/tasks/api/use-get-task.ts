@@ -7,7 +7,7 @@ interface GetTaskOptions {
 
 export const useGetTask = ({ taskId }: GetTaskOptions) => {
   const query = useQuery({
-    queryKey: ['tasks', taskId],
+    queryKey: ['task', taskId],
     queryFn: async () => {
       const response = await client.api.tasks[':taskId'].$get({
         param: {
