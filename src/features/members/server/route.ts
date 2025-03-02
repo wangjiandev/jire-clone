@@ -6,7 +6,7 @@ import { z } from 'zod'
 import { getMember } from '../utils'
 import { DATABASE_ID, MEMBERS_ID } from '@/config'
 import { Query } from 'node-appwrite'
-import { MemberRole } from '../types'
+import { Member, MemberRole } from '../types'
 
 const app = new Hono()
   .get('/', sessionMiddleware, zValidator('query', z.object({ workspaceId: z.string() })), async (c) => {
@@ -29,7 +29,9 @@ const app = new Hono()
       )
     }
 
-    const members = await databases.listDocuments(DATABASE_ID, MEMBERS_ID, [Query.equal('workspaceId', workspaceId)])
+    const members = await databases.listDocuments<Member>(DATABASE_ID, MEMBERS_ID, [
+      Query.equal('workspaceId', workspaceId),
+    ])
 
     const populatedMembers = await Promise.all(
       members.documents.map(async (member) => {

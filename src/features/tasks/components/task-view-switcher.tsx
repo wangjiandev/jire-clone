@@ -18,6 +18,7 @@ import { columns } from './columns'
 import DataKanban from './data-kanban'
 import { TaskStatus } from '../types'
 import DataCalendar from './data-calendar'
+import { useProjectId } from '@/features/projects/hooks/use-project-id'
 
 interface TaskViewSwitcherProps {
   hideProjectFilter?: boolean
@@ -26,14 +27,17 @@ interface TaskViewSwitcherProps {
 const TaskViewSwitcher = ({ hideProjectFilter }: TaskViewSwitcherProps) => {
   const [view, setView] = useQueryState('view', { defaultValue: 'table' })
   const { open } = useCreateTaskModal()
+
   const workspaceId = useWorkspaceId()
+  const paramProjectId = useProjectId()
+
   const { mutate: bulkUpdateTasks, isPending: isBulkUpdateTasksLoading } = useBulkUpdateTasks()
 
   const [{ projectId, status, assigneeId, dueDate }] = useTaskFilters()
 
   const { data: tasks, isLoading: isTasksLoading } = useGetTasks({
     workspaceId,
-    projectId,
+    projectId: paramProjectId ?? projectId,
     status,
     assigneeId,
     dueDate,
