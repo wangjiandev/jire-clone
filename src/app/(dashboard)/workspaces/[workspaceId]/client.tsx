@@ -39,8 +39,8 @@ const WorkspaceIdClient = async () => {
       <Analytics data={analytics} />
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
         <TaskList data={tasks} total={tasks.length} />
-        <ProjectsList data={projects.documents ?? []} total={projects.total} />
-        <MemberList data={members.documents ?? []} total={members.total} />
+        <ProjectsList data={projects.documents as Project[]} total={projects.total} />
+        <MemberList data={members.documents as Member[]} total={members.total} />
       </div>
     </div>
   )
